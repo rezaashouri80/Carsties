@@ -28,6 +28,18 @@ namespace IdentityService
                     RedirectUris={"https://www.getpostman.com"},
                     ClientSecrets=new[] {new Secret("NotASecret".Sha256())},
                     AllowedGrantTypes={GrantType.ResourceOwnerPassword},
+                },
+                new Client
+                {
+                    ClientId="nextApp",
+                    ClientName="nextApp",
+                    AllowedScopes={"openid","profile","auctionApp"},
+                    RedirectUris={"http://localhost:3000/api/auth/callback/id-server"},
+                    ClientSecrets=new[] {new Secret("secret".Sha256())},
+                    AllowedGrantTypes=GrantTypes.CodeAndClientCredentials,
+                    AllowOfflineAccess=true,
+                    AllowPlainTextPkce=false,
+                    AccessTokenLifetime=3600*24*30
                 }
             };
     }

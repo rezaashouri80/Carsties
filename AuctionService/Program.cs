@@ -5,6 +5,7 @@ using AutoMapper;
 using AuctionService.RequestHelpers;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Contracts;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,8 @@ builder.Services.AddAutoMapper(cfg => {
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumersFromNamespaceContaining<AuctionFinished>();
+
     x.AddEntityFrameworkOutbox<AuctionDbContext>(o =>
     {
         o.QueryDelay = TimeSpan.FromSeconds(10);

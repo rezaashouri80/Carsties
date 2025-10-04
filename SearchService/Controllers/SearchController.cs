@@ -29,9 +29,9 @@ namespace SearchService.Controllers
                 _ => query.Sort(a => a.Ascending(a => a.AuctionEnd))
             };
 
-            query = searchParams.OrderBy switch
+            query = searchParams.FilterBy switch
             {
-                "finished" => query.Match(a => a.AuctionEnd > DateTime.UtcNow),
+                "finished" => query.Match(a => a.AuctionEnd < DateTime.UtcNow),
                 "endingSoon" => query.Match(a => a.AuctionEnd < DateTime.UtcNow.AddHours(6)
                 && a.AuctionEnd > DateTime.UtcNow),
                 _ => query.Match(a => a.AuctionEnd > DateTime.UtcNow)

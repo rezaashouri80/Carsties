@@ -39,7 +39,8 @@ namespace IdentityService
                     AllowedGrantTypes=GrantTypes.CodeAndClientCredentials,
                     AllowOfflineAccess=true,
                     AllowPlainTextPkce=false,
-                    AccessTokenLifetime=3600*24*30
+                    AccessTokenLifetime=3600*24*30,
+                    AlwaysIncludeUserClaimsInIdToken=true
                 }
             };
     }

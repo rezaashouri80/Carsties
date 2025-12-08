@@ -7,6 +7,8 @@ type State = {
     searchTerm : string;
     orderBy: string;
     filterBy : string;
+    seller?:string;
+    winner?:string;
 }
 
 type Actions = {
@@ -20,7 +22,9 @@ const initialState : State ={
     searchTerm:'',
     pageCount:1,
     orderBy:"make",
-    filterBy:"live"
+    filterBy:"live",
+    seller:undefined,
+    winner:undefined
 }
 
 

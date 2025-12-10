@@ -1,9 +1,12 @@
+using AuctionService.Consumers;
 using AuctionService.Data;
 using AuctionService.RequestHelpers;
+using AuctionService.Services;
 using AutoMapper;
 using Contracts;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -26,7 +29,10 @@ builder.Services.AddAutoMapper(cfg => {
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumersFromNamespaceContaining<AuctionFinished>();
+
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
+
+    x.AddConsumersFromNamespaceContaining<AuctionFinishedConsumer>();
 
     x.AddEntityFrameworkOutbox<AuctionDbContext>(o =>
     {
@@ -37,7 +43,6 @@ builder.Services.AddMassTransit(x =>
         o.UseBusOutbox();
     });
 
-
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(builder.Configuration["RabbitMq:Host"], "/", h =>
@@ -47,36 +52,41 @@ builder.Services.AddMassTransit(x =>
         });
         cfg.ConfigureEndpoints(context);
     });
+
+
+
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = builder.Configuration["IdentityServiceUrl"];
-        //options.Authority = "http://identity-svc";
+.AddJwtBearer(options =>
+{
+    options.Authority = builder.Configuration["IdentityServiceUrl"];
+    //options.Authority = "http://identity-svc";
 
 
-        options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters.ValidateAudience = false;
-        options.TokenValidationParameters.NameClaimType = "username";
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters.ValidateAudience = false;
+    options.TokenValidationParameters.NameClaimType = "username";
 
-        // You can leave Authority empty or keep it, but it won't be validated
-        //options.Authority = "";
-        //options.RequireHttpsMetadata = false;
+    // You can leave Authority empty or keep it, but it won't be validated
+    //options.Authority = "";
+    //options.RequireHttpsMetadata = false;
 
-        //options.TokenValidationParameters = new TokenValidationParameters
-        //{
-        //    ValidateIssuer = false,        // don't check iss
-        //    ValidateAudience = false,      // optional: don't check aud
-        //    ValidateLifetime = true,       // still check exp/nbf
-        //    ValidateIssuerSigningKey = false, // ignore signature validation (if you want)
-        //    NameClaimType = "username"
-        //};
-    });
+    //options.TokenValidationParameters = new TokenValidationParameters
+    //{
+    //    ValidateIssuer = false,        // don't check iss
+    //    ValidateAudience = false,      // optional: don't check aud
+    //    ValidateLifetime = true,       // still check exp/nbf
+    //    ValidateIssuerSigningKey = false, // ignore signature validation (if you want)
+    //    NameClaimType = "username"
+    //};
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddGrpc();
 
 var app = builder.Build();
 
@@ -91,6 +101,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGrpcService<GrpcAuctionService>();
 
 try
 {

@@ -119,6 +119,20 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+  notif-svc:
+    image: trycatchlearn/notif-svc:latest
+    build:
+      context: .
+      dockerfile: NotificationServices/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - RabbitMq__Host=rabbitmq
+    ports:
+      - 7004:80
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
 volumes:
   pgdata:   

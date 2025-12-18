@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@microsoft/signalr": "^10.0.0",
     "flowbite": "^3.1.2",
     "flowbite-react": "^0.12.9",
     "next": "15.5.3",

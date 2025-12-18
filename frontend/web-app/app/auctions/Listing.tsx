@@ -7,18 +7,20 @@ import { promises } from 'dns';
 import { Pagination } from 'flowbite-react';
 import AppPagination from '../components/AppPagination';
 import { getData } from '../actions/AuctionActions';
-import { Auction, PagedResult } from '@/types';
 import Filters from './Filters';
 import { useParamsStore } from '@/hooks/useParamsStore';
 import { useShallow } from 'zustand/shallow';
 import queryString from 'query-string';
 import EmptyFilter from '../components/EmptyFilters';
+import { useAuctionStore } from '@/hooks/useActionStore';
+import { stat } from 'fs';
 
 
 
 export default function Listing() {
 
-    const[data,setData] = useState<PagedResult<Auction>>()
+    const [loading,setLoading] = useState(true);
+
     const params = useParamsStore(useShallow(state=>({
         pageNumber:state.pageNumber,
         pageSize : state.pageSize,
@@ -29,6 +31,15 @@ export default function Listing() {
         seller : state.seller,
         winner : state.winner
     })));
+
+    const data = useAuctionStore(useShallow(state=>({
+        auctions:state.auctions,
+        totalCount:state.totalCount,
+        pageCount:state.pageCount
+    })))
+
+    const setData = useAuctionStore(state => state.setData)
+
     const setParams = useParamsStore(state=> state.setParams);
     const url = queryString.stringifyUrl({url:'',query:params},{skipEmptyString:true});
 
@@ -40,12 +51,13 @@ export default function Listing() {
 
         getData(url).then(data=>{
             setData(data);
+            setLoading(false);
         })
 
-    },[url])
+    },[url,setData])
 
-    if(data?.results.length===0){
-        <h3>Loading ...</h3>
+    if(loading){
+       return <h3>Loading ...</h3>
     }
 
   return (
@@ -57,7 +69,7 @@ export default function Listing() {
         ) : (
             <>
              <div className='grid grid-cols-4 gap-6'>{
-        data && data.results.map((auction)=>(
+        data && data.auctions.map((auction)=>(
             <AuctionCard key={auction.id} auction={auction} />
         ))
         }

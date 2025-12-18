@@ -1,5 +1,7 @@
 "use client";
 
+import { useBidStore } from "@/hooks/useBidStore";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 function useCountdown(targetDate: string) {
@@ -25,6 +27,12 @@ function useCountdown(targetDate: string) {
 export default function CountdownTimer({ auctionEnd }: { auctionEnd: string }) {
   const { days, hours, minutes, seconds, completed } = useCountdown(auctionEnd);
 
+  const setOpen = useBidStore(state=>state.setOpen);
+  const pathname = usePathname();
+
+  if(pathname.startsWith("/auctions/details") && completed){
+    setOpen(false);
+  }
 
   return (
     <div className={`border-2 border-white text-white py-1 px-2 rounded-lg flex

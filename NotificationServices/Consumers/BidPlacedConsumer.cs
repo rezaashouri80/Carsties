@@ -18,7 +18,7 @@ namespace NotificationServices.Consumers
         {
             Console.WriteLine("=> Bid Placed Notif");
 
-            await _hubContext.Clients.All.SendAsync("BidPlaced", context);
+            await _hubContext.Clients.All.SendAsync("BidPlaced", context.Message);
         }
     }
 }

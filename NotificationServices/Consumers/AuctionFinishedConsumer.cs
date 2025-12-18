@@ -18,7 +18,7 @@ namespace NotificationServices.Consumers
         {
             Console.WriteLine("=> Auction Finished Notif");
 
-            await _hubContext.Clients.All.SendAsync("AuctionFinished", context);
+            await _hubContext.Clients.All.SendAsync("AuctionFinished", context.Message);
         }
     }
 }
